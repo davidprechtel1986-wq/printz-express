@@ -377,12 +377,20 @@ section[id],
   font-size: 0.78rem;
 }
 
-.about-aside-place {
+.about-aside-place,
+.about-aside-places {
   font-family: Barlow, sans-serif;
   font-size: 2rem;
   font-style: italic;
   font-weight: 800;
   margin: 0.2rem 0 0.8rem;
+}
+
+.about-aside-places {
+  list-style: none;
+  padding: 0;
+  font-size: 1.7rem;
+  line-height: 1.25;
 }
 
 .subhead { margin: 1.4rem 0 0.7rem; }
