@@ -67,7 +67,7 @@ function bindForm(formId, statusId) {
         .filter(([, value]) => String(value).trim())
         .map(([key, value]) => `${key}: ${value}`)
         .join("\n");
-      window.location.href = `mailto:?subject=${encodeURIComponent("Anfrage Printz Express")}&body=${encodeURIComponent(body)}`;
+      window.location.href = `mailto:Printz.Express31@gmail.com?subject=${encodeURIComponent("Anfrage Printz Express")}&body=${encodeURIComponent(body)}`;
       form.reset();
       status.classList.remove("error");
       status.textContent = "Vielen Dank. Ihr E-Mail-Programm öffnet sich mit der Anfrage. Alternativ erreichen Sie uns unter +49 173 7712504.";
