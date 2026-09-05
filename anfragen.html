@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eingegangene Anfragen | Printz Express</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" href="assets/logo.jpg" type="image/jpeg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,700;1,800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="Zur Startseite">
+        <img class="brand-logo" src="assets/logo.jpg" alt="Printz Express" width="220" height="80" />
+      </a>
+      <nav class="nav" aria-label="Hauptnavigation">
+        <a href="index.html">Zur Website</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="legal">
+    <div class="container">
+      <p class="section-label">Intern</p>
+      <h1>Eingegangene Anfragen</h1>
+      <p>Hier sieht Printz Express alle ausgefüllten Kunden- und Bewerbungsformulare.</p>
+      <form class="panel-form admin-login" id="admin-form">
+        <label>Zugangscode
+          <input type="password" id="admin-pin" required />
+        </label>
+        <button class="btn btn-primary" type="submit">Anfragen laden</button>
+        <p class="form-note" id="admin-status" role="status"></p>
+      </form>
+      <div id="inquiry-list" class="inquiry-list" hidden></div>
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById("admin-form");
+    const pinInput = document.getElementById("admin-pin");
+    const status = document.getElementById("admin-status");
+    const list = document.getElementById("inquiry-list");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      status.classList.remove("error");
+      status.textContent = "Wird geladen…";
+      try {
+        const response = await fetch("/api/anfragen", {
+          headers: { "X-Admin-Pin": pinInput.value.trim() },
+        });
+        const result = await response.json();
+        if (!response.ok || !result.ok) {
+          throw new Error(result.error || "Kein Zugriff.");
+        }
+        list.hidden = false;
+        if (!result.items.length) {
+          list.innerHTML = "<p>Noch keine Anfragen.</p>";
+        } else {
+          list.innerHTML = result.items.map((item) => `
+            <article class="inquiry-card">
+              <p class="section-label">${item.typ} · ${item.created}</p>
+              <h3>${item.name}${item.firma ? " · " + item.firma : ""}</h3>
+              <p><a href="mailto:${item.email}">${item.email}</a>${item.telefon ? " · " + item.telefon : ""}</p>
+              ${item.leistung ? `<p>Leistung: ${item.leistung}</p>` : ""}
+              ${item.abholort ? `<p>Von ${item.abholort} nach ${item.lieferort}</p>` : ""}
+              ${item.ware ? `<p>Ware: ${item.ware}${item.menge ? " · " + item.menge : ""}</p>` : ""}
+              ${item.termin ? `<p>Termin: ${item.termin}</p>` : ""}
+              ${item.position ? `<p>Position: ${item.position}</p>` : ""}
+              ${item.nachricht ? `<p>${item.nachricht}</p>` : ""}
+            </article>
+          `).join("");
+        }
+        status.textContent = `${result.items.length} Anfrage(n) geladen.`;
+      } catch (error) {
+        status.classList.add("error");
+        status.textContent = error instanceof Error ? error.message : "Laden fehlgeschlagen.";
+      }
+    });
+  </script>
+</body>
+</html>
